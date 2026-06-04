@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donors</title>
+</head>
+<body>
+    
+    <h1>Donors</h1> 
+    <table>
+        <thead>
+            <tr>
+                <th>Name:</th>
+                <th>Age:</th>
+                <th>Contact:</th>
+                <th>Blood Group:</th>
+                <th>Update</th>
+                <th>Delete</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for donors in all_donor %}
+
+            <tr>
+                <td>{{donors.donor_name}}</td>
+                <td>{{donors.donor_age}}</td>
+                <td>{{donors.donor_contact}}</td>
+                <td>{{donors.blood_group}}</td>
+            </tr>
+
+            {%endfor%}
+
+</body>
+</html>

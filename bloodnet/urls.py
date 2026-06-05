@@ -2,8 +2,8 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
-    path('add/',donor_add),
-    path('view/',Donor_view),
-    path('delete/<int:id>/',donor_delete,name='donor_delete'),
-    path('update/<int:id>/',donor_update,name='donor_update'),
+    path('add/',adding_donor.as_view()),
+    path('view/',donor_view.as_view()),
+    path('delete/<int:id>/',donor_delete.as_view(),name='donor_delete'),
+    path('update/<int:id>/',donor_update.as_view(),name='donor_update'),
 ]

@@ -13,8 +13,8 @@
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-4 mb-5">
             <div>
                 <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary mb-3">Blood Net</span>
-                <h1 class="display-6 fw-bold mb-2">Add New Donor</h1>
-                <p class="text-secondary mb-0">Enter donor details and save them to the donor directory.</p>
+                <h1 class="display-6 fw-bold mb-2">{{page_titel}}</h1>
+                <p class="text-secondary mb-0">{{subtitle}}</p>
             </div>
             <a href="/donor/view/" class="btn btn-outline-primary btn-lg">View donors</a>
         </div>
@@ -24,11 +24,11 @@
                 <form method="POST" novalidate>
                     {% csrf_token %}
                     <div class="mb-4">
-                        {{ donor_forms.non_field_errors }}
-                        {{ donor_forms.as_p }}
+                        {{ donor_form.non_field_errors }}
+                        {{ donor_form.as_p }}
                     </div>
                     <div class="d-flex justify-content-end mt-4">
-                        <button type="submit" class="btn btn-primary btn-lg">Save donor</button>
+                        <button type="submit" class="btn btn-primary btn-lg">{{button_text}}</button>
                     </div>
                 </form>
             </div>

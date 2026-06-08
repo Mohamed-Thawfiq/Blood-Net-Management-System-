@@ -65,7 +65,13 @@ class adding_donor(View):
         if donor_data.is_valid():
             donor_data.save()
             return redirect('/donor/view/')
-        
+        context={
+            'donor_form':donor_data,
+            'page_titel':'Add Donor',
+            'subtitle':'Register a new donor 🩸',
+            'button_text':'Add Donor'
+        }
+        return render(request, 'donor_form.html',context)    
 class donor_view(View):
     def get(self,request):
         context={
@@ -94,5 +100,10 @@ class donor_update(View):
         if donors_form.is_valid():
             donors_form.save()
             return redirect('/donor/view/')
-
-        
+        context={
+            'donor_form':donors_form,
+            'page_titel':'Update donor details',
+            'subtitle':'Ensure donor information remains accurate and ready for future donations 🩸 ',
+            'button_text':'Update Donor'
+        }
+        return render(request,'donor_form.html',context)

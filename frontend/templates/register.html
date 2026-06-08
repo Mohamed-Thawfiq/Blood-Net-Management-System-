@@ -18,40 +18,60 @@
                             <h1 class="h3 fw-bold">Create your account</h1>
                             <p class="text-secondary mb-0">Register to manage fans, donors, and all member data with a professional dashboard.</p>
                         </div>
+                        {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            {{ error }}
+                        </div>
+                        {% endif %}
 
-                        <form method="POST">
+                        <form action="" method="POST">
                             {% csrf_token %}
                             <div class="mb-3">
-                                <label class="form-label">Full name</label>
-                                <input type="text" class="form-control" placeholder="Enter your name" required>
+                                <label for="name" class="form-label">Your Name</label>
+                                <input type="text" class="form-control" name="username" id="name" placeholder="@Your Name" value="{{ form_data.username|default:'' }}" required>
                             </div>
+
                             <div class="mb-3">
-                                <label class="form-label">Email address</label>
-                                <input type="email" class="form-control" placeholder="name@example.com" required>
+                                <label for="contact" class="form-label">Contact</label>
+                                <input type="tel" class="form-control" name="contact_num" id="contact" placeholder="@Your Contact Number" value="{{ form_data.contact_num|default:'' }}" required>
                             </div>
+
                             <div class="mb-3">
-                                <label class="form-label">Contact number</label>
-                                <input type="tel" class="form-control" placeholder="Enter your phone number" required>
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" name="email_address" id="email" placeholder="name@example.com" value="{{ form_data.email_address|default:'' }}" required>
                             </div>
+
+                            <div class="mb-3">
+                                <label for="area" class="form-label">Area</label>
+                                <input type="text" class="form-control" name="area_name" id="area" placeholder="@Your Area" value="{{ form_data.area_name|default:'' }}" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_num" class="form-label">Membership Card ID</label>
+                                <input type="text" class="form-control" name="id_no" id="id_num" placeholder="@Your ID" value="{{ form_data.id_no|default:'' }}" required>
+                            </div>
+
                             <div class="mb-3">
                                 <label class="form-label">Account type</label>
-                                <select class="form-select" required>
-                                    <option value="">Choose account type</option>
-                                    <option value="manager">Manager</option>
-                                    <option value="donor">Donor</option>
+                                <select class="form-select" name="acc_type" required>
+                                    <option value="" {% if not form_data.acc_type %}selected{% endif %}>Choose account type</option>
+                                    <option value="manager" {% if form_data.acc_type == 'manager' %}selected{% endif %}>Manager</option>
+                                    <option value="donor" {% if form_data.acc_type == 'donor' %}selected{% endif %}>Donor</option>
                                 </select>
                             </div>
+
                             <div class="mb-3">
-                                <label class="form-label">Password</label>
-                                <input type="password" class="form-control" placeholder="Create a password" required>
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
                             </div>
-                            <div class="d-grid mt-4">
+
+                            <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">Register</button>
                             </div>
                         </form>
 
                         <div class="text-center mt-4">
-                            <p class="mb-0 text-secondary">Already have an account? <a href="/login/" class="text-primary">Login</a></p>
+                            <p class="mb-0 text-secondary">Already have an account? <a href="/" class="text-primary">Login</a></p>
                         </div>
                     </div>
                 </div>

@@ -1,17 +1,17 @@
 from django.db import models
-
 from django.contrib.auth.models import AbstractUser
-# Create your models here.
-class User (AbstractUser):
-    name = models.CharField(max_length=150, default='')
-    age=models.IntegerField(default=0)
-    id_num=models.IntegerField(default=0)
-    area=models.TextField(max_length=50)
-    contact=models.CharField(max_length=20)
+
+class User(AbstractUser):
+    id_num = models.CharField(max_length=50, default='', blank=True)
+    area = models.CharField(max_length=100, default='', blank=True)
+    contact = models.CharField(max_length=20, default='', blank=True)
 
     role_choice = (
-        (0, 'Admin'),
-        (1, 'District_Manager'),
+        (1, 'Manager'),
         (2, 'Area Manager'),
     )
-    role = models.IntegerField(default=0, choices=role_choice)
+    role = models.IntegerField(default=2, choices=role_choice)
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.username} ({self.get_role_display()})"

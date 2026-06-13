@@ -1,0 +1,605 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blood Net | Manager Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
+    <style>
+        .manager-layout { display: flex; min-height: 100vh; }
+        .manager-sidebar {
+            width: 240px; background: #1a1a2e; display: flex;
+            flex-direction: column; flex-shrink: 0;
+            position: sticky; top: 0; height: 100vh; overflow-y: auto;
+        }
+        .manager-main { flex: 1; padding: 32px 36px; background: #F7F8FC; }
+        .nav-section { padding: 16px 12px 0; }
+        .nav-section-label {
+            font-size: 10px; font-weight: 600; color: rgba(160,174,192,0.5);
+            letter-spacing: 1px; text-transform: uppercase;
+            padding: 0 8px; margin-bottom: 6px; display: block; margin-top: 14px;
+        }
+        .nav-section-label:first-child { margin-top: 0; }
+        .m-nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 9px 10px; border-radius: 8px; color: #a0aec0;
+            font-size: 13px; text-decoration: none; margin-bottom: 2px;
+            cursor: pointer; border: none; background: none; width: 100%;
+        }
+        .m-nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .m-nav-item.active { background: #C0392B; color: #fff; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .stat-card {
+            background: #fff; border: 1px solid #E8EAF0;
+            border-radius: 12px; padding: 20px;
+        }
+        .stat-card.red { border-left: 3px solid #C0392B; }
+        .stat-card.green { border-left: 3px solid #16a34a; }
+        .stat-card.blue { border-left: 3px solid #3B82F6; }
+        .stat-card.amber { border-left: 3px solid #d97706; }
+        .stat-label { font-size: 11px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+        .stat-value { font-size: 28px; font-weight: 600; color: #1a1a2e; }
+        .table-card { background: #fff; border: 1px solid #E8EAF0; border-radius: 12px; overflow: hidden; }
+        .table-card-header { padding: 16px 20px; border-bottom: 1px solid #E8EAF0; display: flex; align-items: center; justify-content: space-between; }
+        .table-card-header h3 { font-size: 14px; font-weight: 600; margin: 0; }
+        .blood-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #FDEDED; color: #C0392B; }
+        .status-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; }
+        .badge-green { background: #dcfce7; color: #16a34a; }
+        .badge-yellow { background: #fef9c3; color: #a16207; }
+        .badge-red { background: #fee2e2; color: #b91c1c; }
+        .form-card { background: #fff; border: 1px solid #E8EAF0; border-radius: 12px; padding: 24px; }
+        .btn-red { background: #C0392B; color: #fff; border: none; border-radius: 8px; padding: 9px 20px; font-size: 13px; font-weight: 500; cursor: pointer; }
+        .btn-red:hover { background: #E74C3C; }
+        .am-card { background: #fff; border: 1px solid #E8EAF0; border-radius: 12px; padding: 20px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #FDEDED; color: #C0392B; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 22px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+        .page-header p { font-size: 13px; color: #6b7280; margin: 0; }
+        .empty-state { text-align: center; padding: 40px; color: #6b7280; }
+        .empty-state h4 { font-size: 15px; font-weight: 500; color: #1a1a2e; }
+    </style>
+</head>
+<body>
+<div class="manager-layout">
+
+    <!-- Sidebar -->
+    <div class="manager-sidebar">
+        <div style="padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07)">
+            <div style="width:38px;height:38px;background:#C0392B;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+                <svg viewBox="0 0 24 24" fill="white" width="20" height="20"><path d="M12 2C8 7 5 11 5 14a7 7 0 0014 0c0-3-3-7-7-12z"/></svg>
+            </div>
+            <div style="font-size:16px;font-weight:600;color:#fff">Blood Net</div>
+            <div style="font-size:11px;color:#a0aec0;margin-top:2px">Manager Dashboard</div>
+        </div>
+
+        <div class="nav-section">
+            <span class="nav-section-label">Overview</span>
+            <button class="m-nav-item active" onclick="showSection('overview', this)">📊 Overview</button>
+
+            <span class="nav-section-label">Areas</span>
+            <button class="m-nav-item" onclick="showSection('areas', this)">🗺️ Manage Areas</button>
+            <button class="m-nav-item" onclick="showSection('send_request', this)">🩸 Send Blood Request</button>
+
+            <span class="nav-section-label">Area Managers</span>
+            <button class="m-nav-item" onclick="showSection('pending', this)">
+                ⏳ Pending Approvals
+                {% if pending_ams %}
+                <span style="background:#C0392B;color:#fff;border-radius:20px;padding:1px 7px;font-size:10px;margin-left:auto">{{ pending_ams|length }}</span>
+                {% endif %}
+            </button>
+            <button class="m-nav-item" onclick="showSection('active_ams', this)">👥 Active Managers</button>
+            <button class="m-nav-item" onclick="showSection('analytics', this)">📈 Analytics</button>
+
+            <span class="nav-section-label">Donors</span>
+            <button class="m-nav-item" onclick="showSection('donors', this)">❤️ All Donors</button>
+            <button class="m-nav-item" onclick="showSection('backups', this)">💾 Data Backups</button>
+
+            <span class="nav-section-label">Account</span>
+            <button class="m-nav-item" onclick="showSection('profile', this)">⚙️ Edit Profile</button>
+        </div>
+
+        <div style="padding:12px;border-top:1px solid rgba(255,255,255,0.07);margin-top:auto">
+            <a href="/logout/" style="display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:rgba(224,100,100,0.8);font-size:13px;text-decoration:none">
+                🔓 Logout
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="manager-main">
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="section active">
+            <div class="page-header">
+                <h1>Welcome, {{ request.user.username }} 👋</h1>
+                <p>Manager Dashboard — Blood Net</p>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:24px">
+                <div class="stat-card red">
+                    <div class="stat-label">Total Areas</div>
+                    <div class="stat-value">{{ areas|length }}</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">Active Managers</div>
+                    <div class="stat-value">{{ active_ams|length }}</div>
+                </div>
+                <div class="stat-card amber">
+                    <div class="stat-label">Pending Approvals</div>
+                    <div class="stat-value">{{ pending_ams|length }}</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-label">Blood Requests</div>
+                    <div class="stat-value">{{ blood_requests|length }}</div>
+                </div>
+            </div>
+
+            <!-- Recent Blood Requests -->
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h3>Recent Blood Requests</h3>
+                    <button class="btn-red btn-sm" onclick="showSection('send_request', document.querySelector('[onclick*=send_request]'))">+ Send Request</button>
+                </div>
+                {% if blood_requests %}
+                <div class="table-responsive">
+                    <table class="table" style="margin:0">
+                        <thead style="background:#F7F8FC">
+                            <tr>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Patient</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Blood Group</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Area</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Assigned To</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Units</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.5px">Last Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for req in blood_requests %}
+                        <tr style="border-bottom:1px solid #E8EAF0">
+                            <td style="padding:13px 20px;font-size:13px">{{ req.patient_name }}</td>
+                            <td style="padding:13px 20px"><span class="blood-badge">{{ req.patient_bg }}</span></td>
+                            <td style="padding:13px 20px;font-size:13px">{{ req.hospital_area }}</td>
+                            <td style="padding:13px 20px;font-size:13px">{{ req.assigned_area_manager.username|default:"—" }}</td>
+                            <td style="padding:13px 20px;font-size:13px">{{ req.blood_units }}</td>
+                            <td style="padding:13px 20px;font-size:12px;color:#6b7280">{{ req.last_date }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state"><h4>No blood requests yet</h4></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MANAGE AREAS -->
+        <div id="areas" class="section">
+            <div class="page-header">
+                <h1>Manage Areas</h1>
+                <p>Create and manage blood donation areas</p>
+            </div>
+
+            <!-- Create Area -->
+            <div class="form-card mb-4" style="max-width:480px">
+                <h3 style="font-size:14px;font-weight:600;margin-bottom:16px">Create New Area</h3>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create_area">
+                    <div class="mb-3">
+                        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Area Name</label>
+                        <input type="text" name="area_name" class="form-control" placeholder="e.g. North Chennai" style="font-size:13px" required>
+                    </div>
+                    <button type="submit" class="btn-red">Create Area</button>
+                </form>
+            </div>
+
+            <!-- Areas Table -->
+            <div class="table-card">
+                <div class="table-card-header"><h3>All Areas</h3></div>
+                {% if areas %}
+                <div class="table-responsive">
+                    <table class="table" style="margin:0">
+                        <thead style="background:#F7F8FC">
+                            <tr>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Area Name</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Area Manager</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for area in areas %}
+                        <tr style="border-bottom:1px solid #E8EAF0">
+                            <td style="padding:13px 20px;font-size:13px;font-weight:500">{{ area.name }}</td>
+                            <td style="padding:13px 20px;font-size:13px">{{ area.area_manager.username|default:"Not assigned" }}</td>
+                            <td style="padding:13px 20px">
+                                {% if area.area_manager %}
+                                    <span class="status-badge badge-green">Assigned</span>
+                                {% else %}
+                                    <span class="status-badge badge-yellow">Vacant</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="empty-state"><h4>No areas created yet</h4><p>Create your first area above.</p></div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- SEND BLOOD REQUEST -->
+        <div id="send_request" class="section">
+            <div class="page-header">
+                <h1>Send Blood Request</h1>
+                <p>Assign a blood request to an area manager</p>
+            </div>
+            <div class="form-card" style="max-width:600px">
+                <form method="POST" id="sendRequestForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="send_request">
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Patient Name</label>
+                            <input type="text" name="patient_name" class="form-control" style="font-size:13px" placeholder="Full name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Patient Age</label>
+                            <input type="number" name="patient_age" class="form-control" style="font-size:13px" placeholder="Age" min="1" max="120" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Contact Number</label>
+                            <input type="tel" name="patient_contact" class="form-control" style="font-size:13px" placeholder="10-digit number" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Blood Group</label>
+                            <select name="patient_bg" class="form-select" style="font-size:13px" required>
+                                <option value="">Select blood group</option>
+                                <option>A+</option><option>A-</option>
+                                <option>B+</option><option>B-</option>
+                                <option>AB+</option><option>AB-</option>
+                                <option>O+</option><option>O-</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Hospital Name</label>
+                            <input type="text" name="hospital_name" class="form-control" style="font-size:13px" placeholder="Hospital name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Blood Units Required</label>
+                            <input type="number" name="blood_units" class="form-control" style="font-size:13px" placeholder="Units" min="1" value="1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Last Date</label>
+                            <input type="date" name="last_date" class="form-control" style="font-size:13px" required>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Select Area</label>
+                            <select name="area_id" class="form-select" style="font-size:13px" onchange="loadManagers(this.value)" required>
+                                <option value="">Choose area</option>
+                                {% for area in areas %}
+                                <option value="{{ area.id }}">{{ area.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Assign to Area Manager</label>
+                            <select name="am_id" id="amSelect" class="form-select" style="font-size:13px">
+                                <option value="">Select area first</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-red px-5">Send Request</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- PENDING APPROVALS -->
+        <div id="pending" class="section">
+            <div class="page-header">
+                <h1>Pending Approvals</h1>
+                <p>Area managers waiting for approval</p>
+            </div>
+            {% if pending_ams %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">
+                {% for am in pending_ams %}
+                <div class="am-card">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+                        <div class="avatar">{{ am.username|slice:":2"|upper }}</div>
+                        <div>
+                            <div style="font-size:14px;font-weight:600">{{ am.username }}</div>
+                            <div style="font-size:12px;color:#6b7280">Applied for: {{ am.area }}</div>
+                        </div>
+                        <span class="status-badge badge-yellow ms-auto">Pending</span>
+                    </div>
+                    <div style="font-size:12px;color:#6b7280;margin-bottom:16px">
+                        <div>📱 {{ am.contact|default:"N/A" }}</div>
+                        <div>🪪 ID: {{ am.id_num|default:"N/A" }}</div>
+                    </div>
+                    <!-- Approve with area assignment -->
+                    <form method="POST" style="margin-bottom:8px">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="approve_am">
+                        <input type="hidden" name="am_id" value="{{ am.id }}">
+                        <div class="mb-2">
+                            <select name="area_id" class="form-select form-select-sm" style="font-size:12px" required>
+                                <option value="">Assign to area</option>
+                                {% for area in areas %}
+                                {% if not area.area_manager %}
+                                <option value="{{ area.id }}">{{ area.name }}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-red w-100" style="padding:7px">✓ Approve</button>
+                    </form>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reject_am">
+                        <input type="hidden" name="am_id" value="{{ am.id }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100"
+                            onclick="return confirm('Reject and delete this application?')">✕ Reject</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h4>No pending approvals</h4>
+                <p>All area manager applications have been processed.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ACTIVE AREA MANAGERS -->
+        <div id="active_ams" class="section">
+            <div class="page-header">
+                <h1>Active Area Managers</h1>
+                <p>Currently active area managers</p>
+            </div>
+            {% if active_ams %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px">
+                {% for am in active_ams %}
+                <div class="am-card">
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                        <div class="avatar">{{ am.username|slice:":2"|upper }}</div>
+                        <div>
+                            <div style="font-size:14px;font-weight:600">{{ am.username }}</div>
+                            <div style="font-size:12px;color:#6b7280">{{ am.area }}</div>
+                        </div>
+                        <span class="status-badge badge-green ms-auto">Active</span>
+                    </div>
+                    <div style="font-size:12px;color:#6b7280;margin-bottom:16px">
+                        <div>📱 {{ am.contact|default:"N/A" }}</div>
+                        <div>🪪 ID: {{ am.id_num|default:"N/A" }}</div>
+                    </div>
+                    <form method="POST" onsubmit="return confirm('Terminate {{ am.username }}? Their donor data will be backed up.')">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="terminate_am">
+                        <input type="hidden" name="am_id" value="{{ am.id }}">
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">🔴 Terminate</button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h4>No active area managers</h4>
+                <p>Approve pending applications to assign area managers.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- ANALYTICS -->
+        <div id="analytics" class="section">
+            <div class="page-header">
+                <h1>Area Manager Analytics</h1>
+                <p>Performance overview of all area managers</p>
+            </div>
+            {% if am_stats %}
+            <div class="table-card">
+                <div class="table-card-header"><h3>Performance Summary</h3></div>
+                <div class="table-responsive">
+                    <table class="table" style="margin:0">
+                        <thead style="background:#F7F8FC">
+                            <tr>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Manager</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Area</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Donors</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Donated</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Dropped</th>
+                                <th style="padding:11px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Units</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for stat in am_stats %}
+                        <tr style="border-bottom:1px solid #E8EAF0">
+                            <td style="padding:13px 20px">
+                                <div style="display:flex;align-items:center;gap:10px">
+                                    <div class="avatar" style="width:30px;height:30px;font-size:10px">{{ stat.am.username|slice:":2"|upper }}</div>
+                                    {{ stat.am.username }}
+                                </div>
+                            </td>
+                            <td style="padding:13px 20px;font-size:13px">{{ stat.am.area }}</td>
+                            <td style="padding:13px 20px;font-size:13px">{{ stat.donors }}</td>
+                            <td style="padding:13px 20px"><span class="status-badge badge-green">{{ stat.donated }}</span></td>
+                            <td style="padding:13px 20px"><span class="status-badge badge-red">{{ stat.dropped }}</span></td>
+                            <td style="padding:13px 20px;font-size:13px;font-weight:600">{{ stat.units }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state"><h4>No analytics yet</h4><p>Data will appear once area managers are active.</p></div>
+            {% endif %}
+        </div>
+
+        <!-- ALL DONORS BY AREA -->
+        <div id="donors" class="section">
+            <div class="page-header">
+                <h1>All Donors</h1>
+                <p>Donor records classified by area</p>
+            </div>
+            {% for area_name, donor_list in donors_by_area.items %}
+            <div style="margin-bottom:28px">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                    <h3 style="font-size:15px;font-weight:600;margin:0">{{ area_name }}</h3>
+                    <span class="status-badge badge-green">{{ donor_list|length }} donors</span>
+                </div>
+                {% if donor_list %}
+                <div class="table-card">
+                    <div class="table-responsive">
+                        <table class="table" style="margin:0">
+                            <thead style="background:#F7F8FC">
+                                <tr>
+                                    <th style="padding:10px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Name</th>
+                                    <th style="padding:10px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Age</th>
+                                    <th style="padding:10px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Contact</th>
+                                    <th style="padding:10px 20px;font-size:11px;font-weight:600;color:#6b7280;text-transform:uppercase">Blood Group</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for donor in donor_list %}
+                            <tr style="border-bottom:1px solid #E8EAF0">
+                                <td style="padding:12px 20px;font-size:13px">{{ donor.donor_name }}</td>
+                                <td style="padding:12px 20px;font-size:13px">{{ donor.donor_age }}</td>
+                                <td style="padding:12px 20px;font-size:13px">{{ donor.donor_contact }}</td>
+                                <td style="padding:12px 20px"><span class="blood-badge">{{ donor.blood_group }}</span></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% else %}
+                <div style="background:#fff;border:1px solid #E8EAF0;border-radius:12px;padding:24px;text-align:center;color:#6b7280;font-size:13px">
+                    No donors in this area yet.
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="empty-state"><h4>No areas created yet</h4></div>
+            {% endfor %}
+        </div>
+
+        <!-- DATA BACKUPS -->
+        <div id="backups" class="section">
+            <div class="page-header">
+                <h1>Data Backups</h1>
+                <p>Terminated area manager data — restore to a new area manager</p>
+            </div>
+            {% if backups %}
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px">
+                {% for backup in backups %}
+                <div class="am-card">
+                    <div style="margin-bottom:12px">
+                        <div style="font-size:14px;font-weight:600;margin-bottom:4px">{{ backup.area_name }}</div>
+                        <div style="font-size:12px;color:#6b7280">Former manager: {{ backup.manager_username }}</div>
+                        <div style="font-size:12px;color:#6b7280">Terminated: {{ backup.terminated_at|date:"d M Y" }}</div>
+                        <div style="font-size:12px;color:#6b7280;margin-top:4px">
+                            <span class="status-badge badge-yellow">{{ backup.donor_data|length }} donors backed up</span>
+                        </div>
+                    </div>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="restore_backup">
+                        <input type="hidden" name="backup_id" value="{{ backup.id }}">
+                        <div class="mb-2">
+                            <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">Restore to Area Manager</label>
+                            <select name="am_id" class="form-select form-select-sm" style="font-size:12px" required>
+                                <option value="">Choose area manager</option>
+                                {% for am in active_ams %}
+                                <option value="{{ am.id }}">{{ am.username }} ({{ am.area }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-red w-100" style="padding:7px"
+                            onclick="return confirm('Restore {{ backup.donor_data|length }} donors to selected manager?')">
+                            ♻️ Restore Data
+                        </button>
+                    </form>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h4>No backups available</h4>
+                <p>Terminated area manager data will appear here.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- EDIT PROFILE -->
+        <div id="profile" class="section">
+            <div class="page-header">
+                <h1>Edit Profile</h1>
+                <p>Update your manager account details</p>
+            </div>
+            <div class="form-card" style="max-width:480px">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_profile">
+                    <div class="mb-3">
+                        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Username</label>
+                        <input type="text" name="username" class="form-control" style="font-size:13px"
+                            value="{{ request.user.username }}" placeholder="New username">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Contact Number</label>
+                        <input type="text" name="contact" class="form-control" style="font-size:13px"
+                            value="{{ request.user.contact }}" placeholder="Contact number">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">Membership ID</label>
+                        <input type="text" name="id_num" class="form-control" style="font-size:13px"
+                            value="{{ request.user.id_num }}" placeholder="Membership ID">
+                    </div>
+                    <div class="mb-3">
+                        <label style="font-size:13px;font-weight:500;display:block;margin-bottom:5px">New Password <span style="color:#6b7280;font-weight:400">(leave blank to keep current)</span></label>
+                        <input type="password" name="password" class="form-control" style="font-size:13px"
+                            placeholder="Enter new password">
+                    </div>
+                    <button type="submit" class="btn-red px-5">Save Changes</button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Area manager data for dynamic loading
+const areaManagers = {
+    {% for area in areas %}
+    {{ area.id }}: {% if area.area_manager %}"{{ area.area_manager.id }}|{{ area.area_manager.username }}"{% else %}null{% endif %},
+    {% endfor %}
+};
+
+function showSection(id, btn) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.m-nav-item').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    if (btn) btn.classList.add('active');
+}
+
+function loadManagers(areaId) {
+    const select = document.getElementById('amSelect');
+    select.innerHTML = '<option value="">No manager assigned</option>';
+    if (!areaId || !areaManagers[areaId]) return;
+    const [amId, amName] = areaManagers[areaId].split('|');
+    const opt = document.createElement('option');
+    opt.value = amId;
+    opt.textContent = amName;
+    select.appendChild(opt);
+    select.value = amId;
+}
+</script>
+</body>
+</html>

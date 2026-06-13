@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'frontend',
     'bloodnet',
     'authentication',
+    # 'django_bootstrap5'
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
@@ -89,6 +91,11 @@ DATABASES = {
     }
 }
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'frontend' / 'static',
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

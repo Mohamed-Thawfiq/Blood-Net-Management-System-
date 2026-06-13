@@ -1,0 +1,67 @@
+{% load static %}
+<style>
+.app-layout{display:flex;min-height:100vh}
+.sidebar{width:230px;background:#1a1a2e;display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.logo-icon{width:38px;height:38px;background:#C0392B;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.logo-text{font-size:16px;font-weight:600;color:#fff}
+.logo-sub{font-size:11px;color:#a0aec0;margin-top:2px}
+.nav-group{padding:16px 12px 0;flex:1}
+.nav-label{font-size:10px;font-weight:600;color:rgba(160,174,192,0.5);letter-spacing:1px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;display:block;margin-top:14px}
+.nav-label:first-child{margin-top:0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;color:#a0aec0;font-size:13px;text-decoration:none;margin-bottom:2px;transition:all .15s}
+.nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;text-decoration:none}
+.nav-item.active{background:#C0392B;color:#fff}
+.nav-icon{font-style:normal;font-size:14px}
+.nav-bottom{padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.logout-item{color:rgba(224,100,100,0.8)!important}
+.logout-item:hover{background:rgba(224,100,100,0.1)!important;color:#E05555!important}
+.main-content{flex:1;padding:32px 36px;background:#F7F8FC;min-height:100vh}
+</style>
+
+<div class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+                <path d="M12 2C8 7 5 11 5 14a7 7 0 0014 0c0-3-3-7-7-12z"/>
+            </svg>
+        </div>
+        <div class="logo-text">Blood Net</div>
+        <div class="logo-sub">Donor Management System</div>
+    </div>
+
+    <div class="nav-group">
+        <span class="nav-label">Main</span>
+        <a href="/donor/view/" class="nav-item {% if request.path == '/donor/view/' %}active{% endif %}">
+            <span class="nav-icon">👥</span> Donor Details
+        </a>
+        <a href="/donor/bloodreq/" class="nav-item {% if request.path == '/donor/bloodreq/' %}active{% endif %}">
+            <span class="nav-icon">🩸</span> Blood Requests
+        </a>
+        <a href="/donor/donations/" class="nav-item {% if request.path == '/donor/donations/' %}active{% endif %}">
+            <span class="nav-icon">📊</span> Donation Analysis
+        </a>
+
+        <span class="nav-label">Appointments</span>
+        <a href="/donor/appoint/" class="nav-item {% if request.path == '/donor/appoint/' %}active{% endif %}">
+            <span class="nav-icon">📞</span> Appoint Donor
+        </a>
+        <a href="/donor/appointed/" class="nav-item {% if request.path == '/donor/appointed/' %}active{% endif %}">
+            <span class="nav-icon">📅</span> Appointed Donors
+        </a>
+
+        <span class="nav-label">Rejections</span>
+        <a href="/donor/temporary-rejection/" class="nav-item {% if request.path == '/donor/temporary-rejection/' %}active{% endif %}">
+            <span class="nav-icon">⏳</span> Temporary
+        </a>
+        <a href="/donor/permanent-rejection/" class="nav-item {% if request.path == '/donor/permanent-rejection/' %}active{% endif %}">
+            <span class="nav-icon">🚫</span> Permanent
+        </a>
+    </div>
+
+    <div class="nav-bottom">
+        <a href="/logout/" class="nav-item logout-item">
+            <span class="nav-icon">🔓</span> Logout
+        </a>
+    </div>
+</div>

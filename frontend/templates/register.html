@@ -7,77 +7,193 @@
     <title>Blood Net | Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'frontend/styles.css' %}">
+    <style>
+        body { margin: 0; min-height: 100vh; display: flex; background: #F7F8FC; }
+        .login-left {
+            width: 380px; flex-shrink: 0; background: #1a1a2e;
+            display: flex; flex-direction: column; justify-content: center; padding: 60px 48px;
+        }
+        .login-right {
+            flex: 1; display: flex; align-items: center;
+            justify-content: center; padding: 40px; overflow-y: auto;
+        }
+        .login-card {
+            background: #fff; border: 1px solid #E8EAF0;
+            border-radius: 16px; padding: 40px; width: 100%; max-width: 520px;
+        }
+        .logo-icon {
+            width: 44px; height: 44px; background: #C0392B;
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; margin-bottom: 24px;
+        }
+        .brand-title { font-size: 28px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+        .form-label { font-size: 13px; font-weight: 500; color: #1a1a2e; margin-bottom: 5px; }
+        .form-control, .form-select {
+            font-size: 13px; border: 1px solid #E8EAF0;
+            border-radius: 8px; padding: 10px 14px;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #C0392B;
+            box-shadow: 0 0 0 3px rgba(192,57,43,0.1);
+            outline: none;
+        }
+        .btn-register {
+            width: 100%; background: #C0392B; color: #fff; border: none;
+            border-radius: 8px; padding: 12px; font-size: 14px;
+            font-weight: 500; cursor: pointer;
+        }
+        .btn-register:hover { background: #E74C3C; }
+        .card-title { font-size: 20px; font-weight: 600; color: #1a1a2e; margin-bottom: 4px; }
+        .card-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; }
+        .pending-notice {
+            background: #fef9c3; border: 1px solid #fde047;
+            border-radius: 8px; padding: 12px 16px;
+            font-size: 13px; color: #854d0e; margin-bottom: 20px;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 768px) {
+            .login-left { display: none; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-<body class="bg-light text-body">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-xl-6 col-lg-7 col-md-9">
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-4 p-lg-5">
-                        <div class="text-center mb-4">
-                            <h1 class="h3 fw-bold">Create your account</h1>
-                            <p class="text-secondary mb-0">Register to manage fans, donors, and all member data with a professional dashboard.</p>
-                        </div>
-                        {% if error %}
-                        <div class="alert alert-danger" role="alert">
-                            {{ error }}
-                        </div>
-                        {% endif %}
+<body>
+    <div class="login-left">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="white" width="22" height="22">
+                <path d="M12 2C8 7 5 11 5 14a7 7 0 0014 0c0-3-3-7-7-12z"/>
+            </svg>
+        </div>
+        <div class="brand-title">Blood Net</div>
+        <div style="font-size:14px;color:#a0aec0;line-height:1.6;margin-top:8px">
+            Register as an Area Manager. Your application will be reviewed and approved by a manager before you can log in.
+        </div>
+        <div style="margin-top:32px">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <div style="width:6px;height:6px;border-radius:50%;background:#C0392B"></div>
+                <span style="font-size:13px;color:#a0aec0">Manage donors by area</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <div style="width:6px;height:6px;border-radius:50%;background:#C0392B"></div>
+                <span style="font-size:13px;color:#a0aec0">Track appointments & rejections</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+                <div style="width:6px;height:6px;border-radius:50%;background:#C0392B"></div>
+                <span style="font-size:13px;color:#a0aec0">Coordinate blood requests</span>
+            </div>
+        </div>
+        <div style="margin-top:24px;padding:16px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:12px;color:#a0aec0">
+            ⚠️ You can only register for areas created by a manager that don't already have an assigned area manager.
+        </div>
+    </div>
 
-                        <form action="" method="POST">
-                            {% csrf_token %}
-                            <div class="mb-3">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" name="username" id="name" placeholder="@Your Name" value="{{ form_data.username|default:'' }}" required>
-                            </div>
+    <div class="login-right">
+        <div class="login-card">
+            <div class="card-title">Area Manager Registration</div>
+            <div class="card-sub">Submit your application to join Blood Net</div>
 
-                            <div class="mb-3">
-                                <label for="contact" class="form-label">Contact</label>
-                                <input type="tel" class="form-control" name="contact_num" id="contact" placeholder="@Your Contact Number" value="{{ form_data.contact_num|default:'' }}" required>
-                            </div>
+            {% if success %}
+            <div class="alert alert-success" style="font-size:13px;border-radius:8px">
+                ✅ {{ success }}
+            </div>
+            {% endif %}
 
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email address</label>
-                                <input type="email" class="form-control" name="email_address" id="email" placeholder="name@example.com" value="{{ form_data.email_address|default:'' }}" required>
-                            </div>
+            {% if error %}
+            <div class="alert alert-danger" style="font-size:13px;border-radius:8px">
+                ❌ {{ error }}
+            </div>
+            {% endif %}
 
-                            <div class="mb-3">
-                                <label for="area" class="form-label">Area</label>
-                                <input type="text" class="form-control" name="area_name" id="area" placeholder="@Your Area" value="{{ form_data.area_name|default:'' }}" required>
-                            </div>
+            <div class="pending-notice">
+                ⏳ After registering, wait for manager approval before logging in.
+            </div>
 
-                            <div class="mb-3">
-                                <label for="id_num" class="form-label">Membership Card ID</label>
-                                <input type="text" class="form-control" name="id_no" id="id_num" placeholder="@Your ID" value="{{ form_data.id_no|default:'' }}" required>
-                            </div>
+            <form method="POST" action="/register/">
+                {% csrf_token %}
 
-                            <div class="mb-3">
-                                <label class="form-label">Account type</label>
-                                <select class="form-select" name="acc_type" required>
-                                    <option value="" {% if not form_data.acc_type %}selected{% endif %}>Choose account type</option>
-                                    <option value="manager" {% if form_data.acc_type == 'manager' %}selected{% endif %}>Manager</option>
-                                    <option value="donor" {% if form_data.acc_type == 'donor' %}selected{% endif %}>Donor</option>
-                                </select>
-                            </div>
+                <div class="form-grid">
+                    <div class="mb-3">
+                        <label class="form-label">Full Name <span style="color:#C0392B">*</span></label>
+                        <input type="text" name="username" class="form-control"
+                            placeholder="Your full name"
+                            value="{{ form_data.username|default:'' }}" required>
+                    </div>
 
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required>
-                            </div>
-
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">Register</button>
-                            </div>
-                        </form>
-
-                        <div class="text-center mt-4">
-                            <p class="mb-0 text-secondary">Already have an account? <a href="/" class="text-primary">Login</a></p>
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label">Contact Number <span style="color:#C0392B">*</span></label>
+                        <input type="tel" name="contact" class="form-control"
+                            placeholder="10-digit mobile number"
+                            value="{{ form_data.contact|default:'' }}"
+                            pattern="[0-9]{10,15}" required>
                     </div>
                 </div>
+
+                <div class="form-grid">
+                    <div class="mb-3">
+                        <label class="form-label">Membership Card ID <span style="color:#C0392B">*</span></label>
+                        <input type="text" name="id_num" class="form-control"
+                            placeholder="Your membership ID"
+                            value="{{ form_data.id_num|default:'' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Select Area <span style="color:#C0392B">*</span></label>
+                        <select name="area_id" class="form-select" required>
+                            <option value="">Choose your area</option>
+                            {% for area in available_areas %}
+                            <option value="{{ area.id }}"
+                                {% if form_data.area_id == area.id|stringformat:'s' %}selected{% endif %}>
+                                {{ area.name }}
+                            </option>
+                            {% empty %}
+                            <option value="" disabled>No areas available</option>
+                            {% endfor %}
+                        </select>
+                        {% if not available_areas %}
+                        <div style="font-size:12px;color:#C0392B;margin-top:4px">
+                            No areas available. Contact your manager to create one.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="form-grid">
+                    <div class="mb-3">
+                        <label class="form-label">Password <span style="color:#C0392B">*</span></label>
+                        <input type="password" name="password" class="form-control"
+                            placeholder="Minimum 6 characters" required minlength="6">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password <span style="color:#C0392B">*</span></label>
+                        <input type="password" name="confirm_password" class="form-control"
+                            placeholder="Re-enter password" required minlength="6">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-register mt-2">
+                    Submit Application
+                </button>
+            </form>
+
+            <div style="text-align:center;margin-top:20px;font-size:13px;color:#6b7280">
+                Already have an account?
+                <a href="/" style="color:#C0392B;font-weight:500;text-decoration:none">Sign in</a>
             </div>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Client-side password match check
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const p1 = document.querySelector('[name=password]').value;
+            const p2 = document.querySelector('[name=confirm_password]').value;
+            if (p1 !== p2) {
+                e.preventDefault();
+                alert('Passwords do not match!');
+            }
+        });
+    </script>
 </body>
 </html>

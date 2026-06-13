@@ -57,3 +57,14 @@ Final Year Computer Science Student | Aspiring Software Developer
 ## Feedback
 
 I am continuously learning and improving my development skills. Feedback, suggestions, and contributions are always appreciated.
+
+## Deployment
+
+To deploy this project to Render:
+1. Fix `Procfile` to `web: gunicorn tntj_bw.wsgi`
+2. Push the code to GitHub under your repo.
+3. Create a Render Web Service using the GitHub repository.
+4. Set environment variables: `SECRET_KEY`, `DEBUG=False`, `ALLOWED_HOSTS`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_PORT`.
+5. Run `python manage.py migrate` and `python manage.py collectstatic --noinput`.
+
+You can use `.env.example` as a template for local development.

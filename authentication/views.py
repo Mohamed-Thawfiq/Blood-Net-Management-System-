@@ -8,7 +8,10 @@ from bloodnet.models import Area
 class loginpage(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return self._redirect_by_role(request.user)
+            if request.user.role == 1:
+                return redirect('/dashboard/manager/')
+            if request.user.role == 2:
+                return redirect('/donor/view/')
         return render(request, 'login.html')
 
     def post(self, request):
@@ -285,6 +288,8 @@ class ManagerDashboard(View):
     
 class AreaManagerDashboard(View):
     def get(self, request):
-        if not request.user.is_authenticated or request.user.role != 2:
+        if not request.user.is_authenticated:
+            return redirect('/')
+        if request.user.role != 2:
             return redirect('/')
         return redirect('/donor/view/')

@@ -2,6 +2,7 @@ from django.urls import path
 from .views import *
 
 urlpatterns = [
+    path('public-donor/submit/', PublicDonorCreateView.as_view(), name='public_donor_submit'),
     path('add/', adding_donor.as_view()),
     path('view/', donor_view.as_view()),
     path('delete/<int:id>/', donor_delete.as_view(), name='donor_delete'),

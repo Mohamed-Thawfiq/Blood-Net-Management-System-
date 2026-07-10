@@ -111,7 +111,8 @@ class ManagerDashboard(View):
             return redirect('/')
         from bloodnet.models import (
             add_donors, blood_request,
-            donation_history, TerminatedAreaManagerBackup
+            donation_history, TerminatedAreaManagerBackup,
+            PublicDonorBackup
         )
         from django.db.models import Sum, Count
 
@@ -146,6 +147,11 @@ class ManagerDashboard(View):
         for area in areas:
             donors_by_area[area.name] = add_donors.objects.filter(area=area)
 
+        public_backups = PublicDonorBackup.objects.all().order_by('-created_at')
+        public_backups_by_area = {}
+        for backup in public_backups:
+            area_key = backup.area.strip() if backup.area else 'Unspecified'
+            public_backups_by_area.setdefault(area_key, []).append(backup)
         context = {
             'areas': areas,
             'pending_ams': pending_ams,
@@ -153,6 +159,8 @@ class ManagerDashboard(View):
             'am_stats': am_stats,
             'donors_by_area': donors_by_area,
             'backups': backups,
+            'public_backups': public_backups,
+            'public_backups_by_area': public_backups_by_area,
             'blood_requests': blood_request.objects.all().order_by('-created_at'),
         }
         return render(request, 'manager_dashboard.html', context)
@@ -262,6 +270,28 @@ class ManagerDashboard(View):
                     area=area,
                     assigned_area_manager=am,
                 )
+            except Exception:
+                pass
+
+        elif action == 'import_public_donor':
+            backup_id = request.POST.get('backup_id')
+            am_id = request.POST.get('am_id')
+            try:
+                from bloodnet.models import add_donors
+                backup = PublicDonorBackup.objects.get(id=backup_id)
+                am = User.objects.get(id=am_id, role=2, is_approved=True)
+                area_obj = Area.objects.filter(name=backup.area).first()
+                if not area_obj and am.area:
+                    area_obj = Area.objects.filter(name=am.area).first()
+                add_donors.objects.create(
+                    donor_name=backup.donor_name,
+                    donor_age=backup.donor_age,
+                    donor_contact=backup.donor_contact,
+                    blood_group=backup.blood_group,
+                    area=area_obj,
+                    area_manager=am,
+                )
+                backup.delete()
             except Exception:
                 pass
 

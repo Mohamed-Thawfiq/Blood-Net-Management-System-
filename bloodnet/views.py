@@ -6,7 +6,11 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Sum
 from dateutil.relativedelta import relativedelta
 from django.utils import timezone
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from datetime import date
+import json
 
 
 class adding_donor(LoginRequiredMixin,View):
@@ -138,6 +142,53 @@ class blood_requests(LoginRequiredMixin, View):
             assigned_area_manager=assigned_am,
         )
         return redirect('/donor/bloodreq/')
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class PublicDonorCreateView(View):
+    def get(self, request):
+        return redirect('/')
+
+    def post(self, request):
+        payload = {}
+        if request.content_type == 'application/json':
+            try:
+                payload = json.loads(request.body.decode('utf-8') or '{}')
+            except json.JSONDecodeError:
+                return JsonResponse({'message': 'Invalid JSON payload.'}, status=400)
+        else:
+            payload = request.POST.dict()
+
+        donor_name = (payload.get('name') or '').strip()
+        donor_age = payload.get('age')
+        donor_contact = (payload.get('contact') or '').strip()
+        blood_group = (payload.get('blood_group') or '').strip()
+        address = (payload.get('address') or '').strip()
+        area = (payload.get('area') or '').strip()
+        last_donation = (payload.get('last_donation') or '').strip()
+
+        try:
+            donor_age = int(donor_age) if donor_age not in (None, '', 'null') else 0
+        except (TypeError, ValueError):
+            donor_age = 0
+
+        if not donor_name or not donor_contact or not blood_group or not area:
+            return JsonResponse({'message': 'Name, contact, blood group and area are required.'}, status=400)
+
+        public_donor = PublicDonorBackup.objects.create(
+            donor_name=donor_name,
+            donor_age=donor_age,
+            donor_contact=donor_contact,
+            blood_group=blood_group,
+            address=address,
+            area=area,
+            last_donation=last_donation,
+        )
+
+        return JsonResponse({
+            'message': 'Donor data saved successfully.',
+            'id': public_donor.id,
+        }, status=201)
 
 class viewreq(LoginRequiredMixin, View):
     login_url = '/'

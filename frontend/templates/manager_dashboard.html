@@ -96,6 +96,7 @@
             <span class="nav-section-label">Donors</span>
             <button class="m-nav-item" onclick="showSection('donors', this)">❤️ All Donors</button>
             <button class="m-nav-item" onclick="showSection('backups', this)">💾 Data Backups</button>
+            <button class="m-nav-item" onclick="showSection('public_registers', this)">📝 Public Registers</button>
 
             <span class="nav-section-label">Account</span>
             <button class="m-nav-item" onclick="showSection('profile', this)">⚙️ Edit Profile</button>
@@ -486,6 +487,58 @@
             {% empty %}
             <div class="empty-state"><h4>No areas created yet</h4></div>
             {% endfor %}
+        </div>
+
+        <!-- PUBLIC REGISTERS -->
+        <div id="public_registers" class="section">
+            <div class="page-header">
+                <h1>Public Donor Registers</h1>
+                <p>Incoming public donor submissions grouped by area</p>
+            </div>
+            {% if public_backups_by_area %}
+            {% for area_name, backups in public_backups_by_area.items %}
+            <div style="margin-bottom:28px">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+                    <h3 style="font-size:15px;font-weight:600;margin:0">{{ area_name }}</h3>
+                    <span class="status-badge badge-green">{{ backups|length }} pending</span>
+                </div>
+                {% for backup in backups %}
+                <div class="am-card" style="margin-bottom:14px">
+                    <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap">
+                        <div>
+                            <div style="font-size:14px;font-weight:600">{{ backup.donor_name }}</div>
+                            <div style="font-size:12px;color:#6b7280">Age: {{ backup.donor_age }} · Group: {{ backup.blood_group }}</div>
+                            <div style="font-size:12px;color:#6b7280">Contact: {{ backup.donor_contact }}</div>
+                            <div style="font-size:12px;color:#6b7280">Address: {{ backup.address|default:'—' }}</div>
+                            <div style="font-size:12px;color:#6b7280">Last donation: {{ backup.last_donation|default:'—' }}</div>
+                            <div style="font-size:12px;color:#6b7280;margin-top:4px">Submitted: {{ backup.created_at|date:"d M Y H:i" }}</div>
+                        </div>
+                        <div style="min-width:260px">
+                            <form method="POST" style="display:grid;gap:10px">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="import_public_donor">
+                                <input type="hidden" name="backup_id" value="{{ backup.id }}">
+                                <label style="font-size:12px;font-weight:500;display:block;margin-bottom:4px">Assign to Area Manager</label>
+                                <select name="am_id" class="form-select form-select-sm" style="font-size:12px" required>
+                                    <option value="">Choose area manager</option>
+                                    {% for am in active_ams %}
+                                    <option value="{{ am.id }}">{{ am.username }} ({{ am.area|default:'No area' }})</option>
+                                    {% endfor %}
+                                </select>
+                                <button type="submit" class="btn-red w-100" style="padding:8px">Import Donor</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <h4>No public donor submissions yet</h4>
+                <p>Public registrations will appear here for import.</p>
+            </div>
+            {% endif %}
         </div>
 
         <!-- DATA BACKUPS -->

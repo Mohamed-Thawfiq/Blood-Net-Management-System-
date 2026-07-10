@@ -131,3 +131,17 @@ class TerminatedAreaManagerBackup(models.Model):
 
     def __str__(self):
         return f"Backup: {self.area_name} - {self.manager_username}"
+
+
+class PublicDonorBackup(models.Model):
+    donor_name = models.CharField(max_length=100)
+    donor_age = models.IntegerField(default=0)
+    donor_contact = models.CharField(max_length=25)
+    blood_group = models.CharField(max_length=10)
+    address = models.TextField(blank=True, default='')
+    area = models.CharField(max_length=150, blank=True, default='')
+    last_donation = models.CharField(max_length=50, blank=True, default='')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Public Donor Backup: {self.donor_name}"

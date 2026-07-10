@@ -17,12 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from bloodnet.views import PublicDonorCreateView
-from frontend.views import PublicIndexView
+from authentication.views import loginpage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('donor/', include('bloodnet.urls')),
     path('public-donor/submit/', PublicDonorCreateView.as_view()),
-    path('', PublicIndexView.as_view(), name='public_index'),
+    path('', loginpage.as_view(), name='login'),
     path('', include('authentication.urls')),
 ]
